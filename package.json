@@ -1,0 +1,28 @@
+{
+  "name": "unemployment-claims-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "cross-env NODE_ENV=test playwright test",
+    "test:headed": "cross-env NODE_ENV=test playwright test --headed",
+    "test:ui": "cross-env NODE_ENV=test playwright test --ui",
+    "report": "playwright show-report",
+    "lint": "eslint .",
+    "test:ci": "cross-env CI=true playwright test"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.42.1",
+    "@types/pg": "^8.11.2",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "eslint": "^8.57.0",
+    "typescript": "^5.3.3"
+  }
+}
