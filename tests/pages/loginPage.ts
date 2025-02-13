@@ -9,6 +9,7 @@ export class LoginPage {
   readonly dashboardCount: Locator;
   readonly gridCount: Locator;
   readonly signOutButton: Locator;
+  readonly errorMessage: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -16,16 +17,18 @@ export class LoginPage {
     this.passwordInput = page.locator('#password'); // Updated selector
     this.loginButton = page.locator('button[type="submit"]'); // Updated selector
     this.signOutButton = page.locator('//button[text()="Sign out"]'); // Updated selector
+    this.errorMessage = page.locator('//p[normalize-space()="Invalid email or password. Please try again."]'); // Add this line
+
   }
 
   async login(email: string, password: string) {
+     await this.page.goto('https://visionary-kangaroo-dfdd41.netlify.app/');
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
     await this.page.waitForTimeout(6000); // Explicit wait for 6 seconds
-    await expect(this.page).toHaveURL('/dashboard'); // Verify the URL is the dashboard
+    await expect(page).toHaveURL('https://visionary-kangaroo-dfdd41.netlify.app/dashboard');
   }
-
 
   async logout() {
     await this.signOutButton.click();
