@@ -23,7 +23,7 @@ test.describe('Unemployment Claim Login', () => {
    
     await dashboardPage.validateClaimsCount("In-Progress Claims");
     // Sign out
-    await loginPage.signOutButton.click();
+    await loginPage.logout();
     // Submit claim
     // const claimFormPage = new ClaimFormPage(page);
   });
@@ -31,18 +31,18 @@ test.describe('Unemployment Claim Login', () => {
   test('should fail to login with invalid email', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.login('invalid@example.com', testUsers.validUser.password);
-    await expect(loginPage.errorMessage).toBeVisible();
+    await loginPage.errorMessage('');
   });
 
   test('should fail to login with invalid password', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.login(testUsers.validUser.email, 'invalidpassword');
-    await expect(loginPage.errorMessage).toBeVisible();
+    await loginPage.errorMessage('');
   });
 
   test('should fail to login with empty email and password', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.login('', '');
-    await expect(loginPage.emailInput).toBeFocused();
+    await loginPage.errorMessage('email');
   });
 });
