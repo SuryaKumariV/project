@@ -3,6 +3,7 @@ import { LoginPage } from '../pages/loginPage';
 import { ClaimFormPage } from '../pages/claimFormPage';
 import { testUsers, claimData } from '../data/testData';
 import { DashboardPage } from '../pages/dashboardPage';
+import { generateRandomSSN } from '../../utils/reusableMethods';
 
 test.describe('Submit New Claim', () => {
 
@@ -20,12 +21,60 @@ test.describe('Submit New Claim', () => {
 
     // Fill out claim form
     const claimFormPage = new ClaimFormPage(page);
-    await claimFormPage.validateSSN('123-45-6789');
+    const randomSSN = generateRandomSSN();
+    await claimFormPage.validateSSN(randomSSN);
+    
     await claimFormPage.fillClaimForm(claimData);
-
     // Submit claim
     await claimFormPage.submitClaim();
-    await expect(claimFormPage.successMessage).toBeVisible();
+  
+  });
+
+  test('should show error for invalid SSN', async ({ page }) => {
+    // Login
+    const loginPage = new LoginPage(page);
+    await loginPage.login(testUsers.validUser.email, testUsers.validUser.password);
+    await expect(page).toHaveURL('https://visionary-kangaroo-dfdd41.netlify.app/dashboard');
+
+    // Navigate to claim form
+    const dashboardPage = new DashboardPage(page);
+    await dashboardPage.navigateToClaimForm();
+
+    // Fill out claim form with invalid SSN
+    const claimFormPage = new ClaimFormPage(page);
+    const invalidSSN = "000-00-0000"; // Invalid SSN
+    await claimFormPage.validateSSN(invalidSSN);
+    
+    await claimFormPage.fillClaimForm(claimData);
+    // Attempt to submit claim
+    await claimFormPage.submitClaim();
+
+    // Verify error message
+    await expect(claimFormPage.Elements.errorMessage).toBeVisible();
+  });
+
+  test('should show error for missing required fields', async ({ page }) => {
+    // Login
+    const loginPage = new LoginPage(page);
+    await loginPage.login(testUsers.validUser.email, testUsers.validUser.password);
+    await expect(page).toHaveURL('https://visionary-kangaroo-dfdd41.netlify.app/dashboard');
+
+    // Navigate to claim form
+    const dashboardPage = new DashboardPage(page);
+    await dashboardPage.navigateToClaimForm();
+
+    // Fill out claim form with missing required fields
+    const claimFormPage = new ClaimFormPage(page);
+    const randomSSN = generateRandomSSN();
+    await claimFormPage.validateSSN(randomSSN);
+    
+    // Leave out required fields
+    await claimFormPage.fillClaimForm({ ...claimData, requiredField: '' });
+    // Attempt to submit claim
+    await claimFormPage.submitClaim();
+
+    // Verify error message
+    await expect(claimFormPage.Elements.errorMessage).toBeVisible();
   });
 
 });

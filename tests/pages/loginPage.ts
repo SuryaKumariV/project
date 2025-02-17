@@ -1,38 +1,44 @@
 import { Page, Locator, expect } from '@playwright/test';
 
-export class LoginPage {
+export default class LoginPage {
   readonly page: Page;
-  readonly emailInput: Locator;
-  readonly passwordInput: Locator;
-  readonly loginButton: Locator;
-  readonly totalClaimsLink: Locator;
-  readonly dashboardCount: Locator;
-  readonly gridCount: Locator;
-  readonly signOutButton: Locator;
-  readonly errorMessage: Locator;
-
+ 
   constructor(page: Page) {
     this.page = page;
-    this.emailInput = page.locator('#email'); // Updated selector
-    this.passwordInput = page.locator('#password'); // Updated selector
-    this.loginButton = page.locator('button[type="submit"]'); // Updated selector
-    this.signOutButton = page.locator('//button[text()="Sign out"]'); // Updated selector
-    this.errorMessage = page.locator('//p[normalize-space()="Invalid email or password. Please try again."]'); // Add this line
+  }
 
+  private get Elements() {
+    return {
+      emailInput: this.page.locator('#email'), 
+      passwordInput: this.page.locator('#password'), 
+      loginButton: this.page.locator('button[type="submit"]'), 
+      signOutButton: this.page.locator('//button[text()="Sign out"]'), 
+      errorMessage: this.page.locator('//p[normalize-space()="Invalid email or password. Please try again."]')
+    };
   }
 
   async login(email: string, password: string) {
-     await this.page.goto('https://visionary-kangaroo-dfdd41.netlify.app/');
-    await this.emailInput.fill(email);
-    await this.passwordInput.fill(password);
-    await this.loginButton.click();
-    await this.page.waitForTimeout(6000); // Explicit wait for 6 seconds
-    await expect(page).toHaveURL('https://visionary-kangaroo-dfdd41.netlify.app/dashboard');
+    await this.page.goto('https://visionary-kangaroo-dfdd41.netlify.app/');
+    await this.Elements.emailInput.fill(email); 
+    await this.Elements.passwordInput.fill(password); 
+    await this.Elements.loginButton.click(); 
+    await this.page.waitForTimeout(6000); 
   }
 
   async logout() {
-    await this.signOutButton.click();
-    await this.page.waitForTimeout(3000); // Explicit wait for 3 seconds
-    await expect(this.page).toHaveURL('https://visionary-kangaroo-dfdd41.netlify.app/'); // Verify the URL is the login page
+    await this.Elements.signOutButton.click(); 
+    await this.page.waitForTimeout(3000); 
+    await expect(this.page).toHaveURL('https://visionary-kangaroo-dfdd41.netlify.app/'); 
   }
+
+  async errorMessage(nullinput: string) {
+    if(nullinput === 'email') 
+      await expect(this.Elements.emailInput).toBeFocused();
+      else
+      
+    await expect(this.Elements.errorMessage).toBeVisible();  
 }
+
+}
+
+export { LoginPage };

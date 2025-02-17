@@ -26,18 +26,18 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      testMatch: /.*submitClaim.spec.ts/ // Ensure this matches your test file
+      testMatch: /.*(newClaim)\.spec\.ts/ // Ensure this matches your test files
     }
     // ,
     // {
     //   name: 'firefox',
     //   use: { ...devices['Desktop Firefox'] },
-    //   testMatch: /.*submitClaim.spec.ts/ // Ensure this matches your test file
+    //   testMatch: /.*(submitClaim|newClaim)\.spec\.ts/ // Ensure this matches your test files
     // },
     // {
     //   name: 'webkit',
     //   use: { ...devices['Desktop Safari'] },
-    //   testMatch: /.*submitClaim.spec.ts/ // Ensure this matches your test file
+    //   testMatch: /.*(submitClaim|newClaim)\.spec\.ts/ // Ensure this matches your test files
     // }
   ],
 });

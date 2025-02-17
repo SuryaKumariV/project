@@ -2,34 +2,35 @@ import { Page, Locator, expect } from '@playwright/test';
 
 export class DashboardPage {
   readonly page: Page;
-  totalClaimsLink: Locator;
-  readonly dashboardCount: Locator;
-  readonly gridCount: Locator;
-  totalClaimsCount: Locator;
-  addClaim: Locator;
-  dashboardLink: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.gridCount = page.locator('//tbody[@class="bg-white divide-y divide-gray-200"]/tr'); // Updated selector to get grid count
-    this.dashboardLink = page.locator('//a[normalize-space()="Dashboard"]');
-    this.addClaim=page.locator('//button[normalize-space()="Add Claim"]');
+  }
+
+  private get Elements() {
+    return {
+      gridCount: this.page.locator('//tbody[@class="bg-white divide-y divide-gray-200"]/tr'), // Updated selector to get grid count
+      dashboardLink: this.page.locator('//a[normalize-space()="Dashboard"]'),
+      addClaim: this.page.locator('//button[normalize-space()="Add Claim"]'),
+      totalClaimsLink: (claim: string) => this.page.locator(`//dt[normalize-space()="${claim}"]`),
+      totalClaimsCount: (claim: string) => this.page.locator(`//dt[normalize-space()="${claim}"]/following-sibling::dd`)
+    };
   }
 
   async validateClaimsCount(claim: string) {
-    this.totalClaimsLink = this.page.locator(`//dt[normalize-space()="${claim}"]`);
-    this.totalClaimsCount = this.page.locator(`//dt[normalize-space()="${claim}"]/following-sibling::dd`);
+    const totalClaimsLink = this.Elements.totalClaimsLink(claim); // Updated to use this.Elements
+    const totalClaimsCount = this.Elements.totalClaimsCount(claim); // Updated to use this.Elements
     await this.page.waitForTimeout(2000); // Reduced wait time to 2 seconds
-    const dashboardCountText = await this.totalClaimsCount.textContent();
+    const dashboardCountText = await totalClaimsCount.textContent();
     const dashboardCount = parseInt(dashboardCountText || '0', 10);
-    await this.totalClaimsLink.click();
+    await totalClaimsLink.click();
     await this.page.waitForTimeout(3000); // Reduced wait time to 3 seconds
-    const gridRows = dashboardCount !== 0 ? await this.gridCount.count() : 0;
+    const gridRows = dashboardCount !== 0 ? await this.Elements.gridCount.count() : 0; // Updated to use this.Elements
     expect(dashboardCount).toEqual(gridRows);
-    await this.dashboardLink.click();
+    await this.Elements.dashboardLink.click(); // Updated to use this.Elements
   }
 
   async navigateToClaimForm() {
-    await this.addClaim.click();
+    await this.Elements.addClaim.click(); // Updated to use this.Elements
   }
 }
