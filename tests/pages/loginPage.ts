@@ -32,13 +32,11 @@ export default class LoginPage {
   }
 
   async errorMessage(nullinput: string) {
-    if(nullinput === 'email') 
+    if (nullinput === 'email')
       await expect(this.Elements.emailInput).toBeFocused();
-      else
-      
-    await expect(this.Elements.errorMessage).toBeVisible();  
-}
-
+    else
+      await expect(this.Elements.errorMessage).toBeVisible();
+  }
 }
 
 export { LoginPage };

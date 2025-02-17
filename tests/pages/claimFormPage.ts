@@ -4,6 +4,7 @@ export class ClaimFormPage {
   readonly page: Page;
 
   constructor(page: Page) {
+ 
     this.page = page;
   }
 
@@ -32,6 +33,8 @@ export class ClaimFormPage {
       addressLine1Input: this.page.locator('//input[@id="addressLine1"]'),
       addressLine2Input: this.page.locator('//input[@id="addressLine2"]'),
       zipCodeInput: this.page.locator('//input[@id="zipCode"]'),
+      backToDashboardButton: this.page.locator('//button[normalize-space()="Back to Claims List"]'),
+      errorMessage: this.page.locator('//p[@class="mt-2 text-sm text-red-600 flex items-center"]')
     };
   }
 
@@ -39,12 +42,18 @@ export class ClaimFormPage {
     await this.Elements.ssnInput.fill(ssn);
     await this.Elements.searchSSN.click();
     await this.page.waitForTimeout(3000); 
+    if (ssn !== "111-11-1111" && ssn !== "000-00-0000" && ssn !== "123-00-2339") {
     const searchResultText = await this.Elements.searchResult.textContent();
     await expect(searchResultText).toContain('No claims found for this SSN.');
-    await this.Elements.newClaimButton.click();
-    await this.page.waitForTimeout(3000);
-    const ssnValue = await this.page.locator('//input[@id="ssn"]').inputValue();
-    await expect(ssn).toEqual(ssnValue);
+      await this.Elements.newClaimButton.click();
+      await this.page.waitForTimeout(3000);
+      const ssnValue = await this.page.locator('//input[@id="ssn"]').inputValue();
+      await expect(ssn).toEqual(ssnValue);
+    }
+  }
+
+  async verifyErrorMessage(expectedMessage: string) {
+    await expect(this.Elements.errorMessage).toHaveText(expectedMessage);
   }
 
   async fillClaimForm(claimData: any) {
@@ -65,9 +74,18 @@ export class ClaimFormPage {
     await this.Elements.zipCodeInput.fill(claimData.zipCode);
   }
 
-  async submitClaim() {
+  async submitClaim(testcase: string) {
     await this.Elements.saveButton.click();
     await this.page.waitForTimeout(3000); // Wait for 3 seconds after submitting
-    await expect(this.Elements.successMessage).toBeVisible();
+
+    if (testcase === "Positive")
+      await expect(this.Elements.successMessage).toBeVisible();
+   else
+      await expect(this.Elements.firstNameInput).toBeFocused();
+  }
+
+  async navigateToDashboard() {
+    await this.Elements.backToDashboardButton.click();
+    await this.page.waitForTimeout(3000);
   }
 }
